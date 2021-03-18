@@ -52,6 +52,7 @@ namespace FunctionLikeEmpleado
                     com.CommandText = sqlupdate;
                     com.ExecuteNonQuery();
                     cn.Close();
+                    return new OkObjectResult(mensaje);
                 }
                 else
                 {
@@ -60,7 +61,6 @@ namespace FunctionLikeEmpleado
                     return new BadRequestObjectResult("No existe el empleado " + empno);
                 }
             }
-            return new OkObjectResult("");
         }
     }
 }
