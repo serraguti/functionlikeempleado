@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace FunctionLikeEmpleado
 {
@@ -17,7 +18,7 @@ namespace FunctionLikeEmpleado
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post"
             , Route = null)] HttpRequest req,
-            ILogger log)
+            ILogger log, ExecutionContext context)
         {
             log.LogInformation("App para dar Like a Empleados");
 
@@ -30,7 +31,15 @@ namespace FunctionLikeEmpleado
             {
                 return new BadRequestObjectResult("Necesitamos el parámetro de {empno}");
             }
-            String cadenaconexion = @"Data Source=LOCALHOST;Initial Catalog=HOSPITAL;Persist Security Info=True;User ID=SA;Password=MCSD2020";
+            var config = new ConfigurationBuilder()
+                .SetBasePath(context.FunctionAppDirectory)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+            string cadenaconexion =
+                    config.GetConnectionString("cadenahospital");
+
+            //String cadenaconexion = @"Data Source=LOCALHOST;Initial Catalog=HOSPITAL;Persist Security Info=True;User ID=SA;Password=MCSD2020";
             using (SqlConnection cn = new SqlConnection(cadenaconexion))
             {
                 String sqlselect = "select * from emp where emp_no=" + empno;
